@@ -1,0 +1,49 @@
+apiVersion: apps/v1 
+kind: Deployment 
+metadata: 
+  labels: 
+    app: denyenv 
+  name: denyenv 
+spec: 
+  replicas: 1 
+  selector: 
+    matchLabels: 
+      app: denyenv 
+  template: 
+    metadata: 
+      labels: 
+        app: denyenv 
+    spec: 
+      containers: 
+        - image: denyenv-validating-admission-webhook:v1 
+          env: 
+            - name: CERT_DIR 
+              value: "/etc/denyenv-webhook/certs" 
+          name: denyenv 
+          ports: 
+            - containerPort: 8000 
+              protocol: TCP 
+          volumeMounts: 
+            - mountPath: /etc/denyenv-webhook/certs 
+              name: tls-cert 
+      volumes: 
+        - name: tls-cert 
+          secret: 
+            secretName: denyenv-tls-secret 
+
+--- 
+apiVersion: v1 
+kind: Service 
+metadata: 
+  labels: 
+    app: denyenv 
+  name: denyenv 
+spec: 
+  ports: 
+    - name: https 
+      port: 443 
+      protocol: TCP 
+      targetPort: 8000 
+  selector: 
+    app: denyenv 
+  type: ClusterIP

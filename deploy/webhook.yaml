@@ -1,0 +1,34 @@
+apiVersion: admissionregistration.k8s.io/v1 
+kind: ValidatingWebhookConfiguration 
+metadata: 
+  name: denyenv 
+webhooks: 
+  - admissionReviewVersions: 
+      - v1                  #webhook支持的admissionReview版本 
+    clientConfig: 
+      caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURIekNDQWdlZ0F3SUJBZ0lVV1g5cEFBUmdva0N0VnpOd3oxb0c3WDBnbmhVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0hqRWNNQm9HQTFVRUF3d1RaR1Z1ZVdWdWRpNWtaV1poZFd4MExuTjJZekFnRncweU5EQXlNREl3TXpNegpNVFJhR0E4eU1EVXhNRFl5TURBek16TXhORm93SGpFY01Cb0dBMVVFQXd3VFpHVnVlV1Z1ZGk1a1pXWmhkV3gwCkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFMdGVISzlEaU5mQWEyanQKb1pqdk0xTmtpRmc3QUNDdS9Qc0VjY0NiNlpzb1hWWTUrbytDSFlsRGJqWGUvZ25KZDYwcmJEN2hRQ291Z3A0SgprUUhCUmIrVDJDeTcyNllKY2FDQVBCNU80V2RoUlF2aDZwMUhWano4UnpFVlhGNkUrM1Y1YlB4dFpVRkJ6NXBZCmZiVjBsQ3VGbDRhdHBJRjVZT0dCMHJkUnpCVzZQYm9pVmJWTW9QSlU2elZIK2hTc3ZaamRlcUhoMUlSYWw4bHcKTmpQUHAyUmJ6WC9uSlU0SU5KSkZFc2xGTjl0Y0Q0TFY4dGY3UDlXUkJOM3oyOURLUjVmTDFWTEtzb3JKOXdmRApxRG45UWVMT0cxUlg0cmNIb21UWDdCOUF4a3lGdWZJKy8yODZ5dkdwNjdVMHFQVWs2ckhNVmlsbytzREpVNG83Cmc5ME5OdXNDQXdFQUFhTlRNRkV3SFFZRFZSME9CQllFRklsM1UreFExeDl0c2c0Qkx5NnBodm9IRHpxbE1COEcKQTFVZEl3UVlNQmFBRklsM1UreFExeDl0c2c0Qkx5NnBodm9IRHpxbE1BOEdBMVVkRXdFQi93UUZNQU1CQWY4dwpEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBTFNNNS9YaytuM1pvNXZuY0oyYi9aeHNVd2I2OWZWWGdaeCtqbVpxClhFU3FhY3hlbHJJUWN6WVJkTENDZmVicVFHRFVXYkw1YWxRZmU0R2I2ZHZHK0RUM3FVL3NHY21rNmIwV0kyK1AKemw4b1VYSWF3YW13Y0o5UHU0RXVSRGtpNjYvNm8za1FtZVROb29vRVRYYXU3VDJCSTZlZVlyeFc0Slk3TWJsaAowY2wyRmxoeTc4eG9EcC8zZlk0SUtROXJyQ09TNHN4U0I5cHAvR1Vtd1F1ZDlPTkY0eFg0SWd2S2EreWY4RXpMCmFBamxybnFnRkZFeDVuM2dHcnYyTm1oRTZJYUpWV043eXMrK2dOT3RlcU4ybVlJL1p1d3pPU0syMERKQUo3WWEKaVRSSjl6T24yVjFjbnZ1aHk2b0NzdEx0Q29UVFpZSERrMXFtWU9ET1RyR05XbW89Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"           #为上一步ca证书base64编码后的内容 
+      service:               #webhook的访问信息，如webhook部署在集群外，可用url代替service字段 
+        name: denyenv 
+        namespace: default 
+        port: 443 
+        path: /validate 
+    failurePolicy: Fail      #若admission调用失败(访问异常或处理异常)，Fail拒绝请求，Ignore允许请求
+    matchPolicy: Exact 
+    name: denyenv.dev.io 
+    rules: 
+      - apiGroups: 
+          - "" 
+        apiVersions: 
+          - v1 
+        operations: 
+          - CREATE 
+        resources: 
+          - pods 
+        scope: '*'    #如果使用objectSelector筛选，该字段不能设置为Namespaced，可以配置为"*"或者"Cluster" 
+    namespaceSelector:  #命名空间级别的标签匹配；可以使用objectSelector对工作负载级别进行匹配 
+      matchExpressions: 
+      - key: kubernetes.io/metadata.name 
+        operator: In 
+        values: ["default", "test"] 
+    sideEffects: None 
+    timeoutSeconds: 3
