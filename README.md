@@ -20,9 +20,16 @@ GOOS=linux go build -o denyenv-validating-admission-webhook ./main.go
 ```bashs
 kubectl create secret generic denyenv-tls-secret  --from-file=tls.key=certs/denyenv.key  --from-file=tls.crt=certs/denyenv.crt
 ```
-##  测试（webhook服务正常）
+##  测试
 
-![Alt text](image.png)
+### 部署webhook
+```bashs
+kubectl apply -f deploy/
+```
+
+### 结果展示
+![Alt text](img/image.png)
+webhook服务正常
 
 # 教程
 https://bbs.huaweicloud.com/blogs/419088#H11
