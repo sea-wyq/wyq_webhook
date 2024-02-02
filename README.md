@@ -15,7 +15,8 @@ cat ca.crt | base64 -w 0
 ```bash
 GOOS=linux go build -o denyenv-validating-admission-webhook ./main.go
 ```
-## 用服务端私钥和服务端证书生成K8S集群的secret资源，挂载到webhook工作负载中   
+## 生成secret
+用服务端私钥和服务端证书生成K8S集群的secret资源，挂载到webhook工作负载中。
 
 ```bashs
 kubectl create secret generic denyenv-tls-secret  --from-file=tls.key=certs/denyenv.key  --from-file=tls.crt=certs/denyenv.crt
